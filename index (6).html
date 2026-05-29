@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Rota</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F5F4F1;--surface:#FFFFFF;--surface2:#F9F8F6;--border:#E8E5DF;--border2:#D8D4CC;
+  --text:#1A1916;--text2:#5A574F;--text3:#9A9690;--navy:#1C2B4A;--navy2:#243560;
+  --emea-bg:#EBF0F8;--emea-banner:#2A4A8A;--emea-soft:#D6E4F5;--emea-text:#1A3066;
+  --us-bg:#EBF5EB;--us-banner:#2A6A3A;--us-soft:#C8EAD0;--us-text:#1A4A25;
+  --aus-bg:#F8F0E8;--aus-banner:#8A4A20;--aus-soft:#F0D8BE;--aus-text:#5C3010;
+  --s08bg:#FEF0E6;--s08b:#F9C89A;--s09bg:#E6F7EC;--s09b:#8ADAAA;
+  --s093bg:#E6F5F5;--s093b:#7ACECE;--s10bg:#EAECfA;--s10b:#9AAAE8;
+  --s14bg:#F2E6FA;--s14b:#C89AE8;--stoilbg:#EEE6FA;--stoilb:#B89AE0;
+  --salbg:#FDF5E0;--salb:#EAD070;--ssickbg:#FAE6E6;--ssickb:#E89A9A;
+  --swfhbg:#E6EEF8;--swfhb:#9AC0E8;--soffbg:#F2F0EC;--soffb:#D0CCC4;
+  --sbhbg:#FAF5E0;--sbhb:#E0C860;--sdepbg:#FAE6F0;--sdepb:#E89AC0;
+  --shcabg:#E6F5EA;--shcab:#8AD0A0;--scustbg:#F5F0FF;--scustb:#C0A0E8;
+  --radius-sm:6px;--radius:10px;--radius-lg:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:13px;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* NAV */
+.nav{background:var(--navy);height:52px;display:flex;align-items:center;padding:0 16px;gap:4px;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.18);}
+.nav-brand{display:flex;align-items:center;gap:10px;margin-right:8px;}
+.nav-icon{width:30px;height:30px;background:linear-gradient(135deg,#E8621A,#C84A00);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.nav-name{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+.nav-div{width:1px;height:24px;background:rgba(255,255,255,.12);margin:0 4px;}
+.nav-tab{padding:5px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:500;color:rgba(255,255,255,.55);border:none;background:transparent;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.nav-tab:hover{background:rgba(255,255,255,.1);color:#fff;}
+.nav-tab.active{background:rgba(255,255,255,.16);color:#fff;}
+.nav-spacer{flex:1;}
+.week-nav{display:flex;align-items:center;gap:5px;}
+.wbtn{width:28px;height:28px;border-radius:var(--radius-sm);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s;line-height:1;}
+.wbtn:hover{background:rgba(255,255,255,.2);}
+.wlabel{font-size:11px;font-weight:600;color:rgba(255,255,255,.9);min-width:124px;text-align:center;font-family:'JetBrains Mono',monospace;}
+.nbtn{padding:5px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap;margin-left:3px;}
+.nbtn:hover{background:rgba(255,255,255,.2);}
+.nbtn.primary{background:#E8621A;border-color:#E8621A;}
+.nbtn.primary:hover{background:#D45510;}
+.nbtn.green{background:#2A6A3A;border-color:#2A6A3A;}
+.nbtn.green:hover{background:#1A5A2A;}
+
+/* SYNC STATUS */
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#4AE88A;margin-right:4px;flex-shrink:0;}
+.sync-dot.syncing{background:#EAD070;animation:pulse 1s infinite;}
+.sync-dot.error{background:#E89A9A;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* TZ STRIP */
+.tz-strip{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:stretch;overflow-x:auto;}
+.tz-item{display:flex;align-items:center;gap:10px;padding:7px 16px;border-right:1px solid var(--border);flex-shrink:0;}
+.tz-pip{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.tz-info{display:flex;flex-direction:column;gap:1px;}
+.tz-region{font-size:10px;font-weight:700;color:var(--text);}
+.tz-time{font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--text);}
+.tz-zone{font-size:9px;color:var(--text3);}
+.tz-local{margin-left:auto;padding:7px 16px;font-size:10px;color:var(--text3);display:flex;align-items:center;}
+
+/* COVERAGE STRIP */
+.cov-strip{background:var(--surface);border-bottom:2px solid var(--border);padding:8px 14px;display:flex;gap:10px;overflow-x:auto;align-items:flex-start;}
+.cov-region{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;min-width:240px;flex-shrink:0;}
+.cov-rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.cov-rname{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.cov-total{font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--text2);}
+.cov-pills{display:flex;flex-wrap:wrap;gap:4px;}
+.cov-pill{display:flex;align-items:center;gap:4px;padding:2px 7px;border-radius:20px;font-size:9.5px;font-weight:600;border:1px solid;white-space:nowrap;}
+.cov-pill-l{opacity:.7;font-weight:500;}
+.cov-pill-n{font-family:'JetBrains Mono',monospace;font-weight:700;}
+
+/* SEARCH BAR */
+.search-bar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);}
+.search-input-wrap{position:relative;flex:1;max-width:320px;}
+.search-input-wrap input{width:100%;padding:5px 10px 5px 30px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;background:var(--surface);color:var(--text);height:30px;}
+.search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);}
+.search-clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;display:none;}
+.filter-select{padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:11px;background:var(--surface);color:var(--text);height:30px;}
+.search-results-info{font-size:11px;color:var(--text3);margin-left:4px;}
+
+/* MAIN */
+.main{padding:12px 12px 60px;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+.page-title{font-size:15px;font-weight:700;color:var(--navy);}
+.page-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+
+/* ROTA */
+.rota-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;}
+.rota-scroll{overflow-x:auto;}
+table.rota{width:100%;border-collapse:collapse;font-size:11px;min-width:860px;}
+.rota thead th{background:var(--navy);color:rgba(255,255,255,.75);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.6px;padding:8px 5px;white-space:nowrap;position:sticky;top:52px;z-index:10;border-right:1px solid rgba(255,255,255,.06);}
+.rota thead th.th-today{background:#2A4A8A;color:#fff;}
+.rota thead th.th-we{background:#263050;color:rgba(255,255,255,.45);}
+.rota thead th.th-skill{width:60px;text-align:left;padding-left:12px;}
+.rota thead th.th-name{width:72px;text-align:left;}
+.rota thead th.th-surn{width:96px;text-align:left;}
+.rota thead th.th-day{width:96px;}
+.date-row th{background:#232E48;font-size:9px;color:rgba(255,255,255,.4);font-family:'JetBrains Mono',monospace;padding:3px 5px;border-bottom:2px solid rgba(255,255,255,.08);position:sticky;top:88px;z-index:10;border-right:1px solid rgba(255,255,255,.05);}
+.date-row th.th-today{background:#2A4A8A;color:rgba(255,255,255,.8);}
+.date-row th.th-we{background:#1E2640;}
+.region-row td{padding:8px 12px;font-weight:700;font-size:11px;letter-spacing:.2px;border-top:3px solid;color:#fff;}
+.rr-emea td{background:var(--emea-banner);border-color:#1A3A7A;}
+.rr-us td{background:var(--us-banner);border-color:#1A5A2A;}
+.rr-aus td{background:var(--aus-banner);border-color:#7A3A10;}
+.skill-row td{padding:3px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);border-bottom:1px solid var(--border);border-top:1px solid var(--border);}
+.sr-emea td{background:#F0F4FA;}
+.sr-us td{background:#F0F5F0;}
+.sr-aus td{background:#FAF4EE;}
+.staff-row td{padding:2px 4px;border-bottom:1px solid #F0EDE6;vertical-align:middle;height:28px;}
+.staff-row:nth-child(even) td{background:var(--surface2);}
+.staff-row td.td-today{background:#FFF8E8!important;}
+.staff-row td.td-we{background:#F5F3EE!important;}
+.staff-row:nth-child(even) td.td-we{background:#F0EDE6!important;}
+.staff-row.hidden-row{display:none;}
+.cell-skill{font-size:8px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;padding-left:8px!important;}
+.cell-first{font-weight:600;color:var(--text);font-size:11px;}
+.cell-last{color:var(--text2);font-size:11px;}
+.esp-dot{width:5px;height:5px;border-radius:50%;background:#C60B1E;display:inline-block;margin-right:3px;vertical-align:middle;}
+
+/* SHIFT SELECTS */
+.ss{width:100%;height:24px;border-radius:4px;border:1px solid;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;cursor:pointer;appearance:none;-webkit-appearance:none;text-align:center;padding:0 2px;transition:opacity .1s;}
+.ss:hover{opacity:.82;}
+.s08{background:var(--s08bg);color:#9A3A00;border-color:var(--s08b);}
+.s09{background:var(--s09bg);color:#0A6A28;border-color:var(--s09b);}
+.s093{background:var(--s093bg);color:#086060;border-color:var(--s093b);}
+.s10{background:var(--s10bg);color:#1E2E9A;border-color:var(--s10b);}
+.s14{background:var(--s14bg);color:#5A1A8A;border-color:var(--s14b);}
+.s5hr{background:var(--s14bg);color:#5A1A8A;border-color:var(--s14b);}
+.stoil{background:var(--stoilbg);color:#3A1070;border-color:var(--stoilb);}
+.sal{background:var(--salbg);color:#7A5500;border-color:var(--salb);}
+.ssick{background:var(--ssickbg);color:#8A1010;border-color:var(--ssickb);}
+.swfh{background:var(--swfhbg);color:#1A4A88;border-color:var(--swfhb);}
+.soff{background:var(--soffbg);color:#6A6660;border-color:var(--soffb);}
+.sbh{background:var(--sbhbg);color:#6A5500;border-color:var(--sbhb);}
+.sdep{background:var(--sdepbg);color:#8A1A4A;border-color:var(--sdepb);}
+.shca{background:var(--shcabg);color:#0A5A1A;border-color:var(--shcab);}
+.scust{background:var(--scustbg);color:#4A1A8A;border-color:var(--scustb);}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:5px;padding:8px 12px;background:var(--surface2);border-top:1px solid var(--border);}
+.leg-item{display:flex;align-items:center;gap:3px;font-size:9px;color:var(--text2);white-space:nowrap;}
+.leg-sw{width:10px;height:10px;border-radius:3px;border:1px solid;flex-shrink:0;}
+
+/* AMBER WARNING */
+.ambers{display:flex;flex-direction:column;gap:6px;padding:8px 12px;background:#FEFAE8;border-bottom:1px solid #EAD890;}
+.amber-item{font-size:11px;color:#7A5500;display:flex;align-items:flex-start;gap:6px;}
+
+/* DIRECTORY */
+.dir-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;}
+.dir-toolbar{padding:8px 12px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border);background:var(--surface2);flex-wrap:wrap;}
+.dir-count{margin-left:auto;font-size:10px;color:var(--text3);font-weight:600;background:var(--surface2);padding:2px 8px;border-radius:20px;border:1px solid var(--border);}
+table.dir{width:100%;border-collapse:collapse;font-size:12px;}
+.dir thead th{background:var(--navy);color:rgba(255,255,255,.75);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;text-align:left;border-right:1px solid rgba(255,255,255,.06);}
+.dir tbody td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.dir tbody tr:hover td{background:var(--surface2);}
+.reg-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:9.5px;font-weight:700;}
+.rb-EMEA{background:var(--emea-soft);color:var(--emea-text);}
+.rb-US{background:var(--us-soft);color:var(--us-text);}
+.rb-AUS{background:var(--aus-soft);color:var(--aus-text);}
+.sk-badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;background:#EEECe8;color:var(--text2);}
+.edit-btn{padding:3px 8px;border:1px solid var(--border);border-radius:4px;background:var(--surface);font-family:inherit;font-size:10px;cursor:pointer;color:var(--text2);transition:all .12s;}
+.edit-btn:hover{background:var(--emea-soft);color:var(--emea-text);border-color:var(--emea-text);}
+
+/* LEAVE */
+.leave-wrap{display:flex;flex-direction:column;gap:12px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;}
+.card-hdr{padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:8px;}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);}
+.card-body{padding:12px 14px;}
+.form-grid{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;}
+.ff{display:flex;flex-direction:column;gap:3px;flex:1;min-width:120px;}
+.ff label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);}
+.ff input,.ff select{padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;background:var(--surface);color:var(--text);height:30px;}
+.btn-add{background:var(--emea-banner);color:#fff;border:none;padding:0 14px;height:30px;border-radius:var(--radius-sm);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;align-self:flex-end;transition:background .15s;}
+.btn-add:hover{background:#1A3A7A;}
+table.leave{width:100%;border-collapse:collapse;font-size:11px;}
+.leave thead th{background:var(--navy);color:rgba(255,255,255,.75);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:7px 10px;text-align:left;border-right:1px solid rgba(255,255,255,.06);}
+.leave tbody td{padding:6px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.leave tbody tr:hover td{background:var(--surface2);}
+.lt-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:9.5px;font-weight:700;}
+.btn-del{background:none;border:none;color:#C82A2A;cursor:pointer;font-size:12px;padding:2px 6px;border-radius:4px;transition:background .12s;}
+.btn-del:hover{background:var(--ssickbg);}
+
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px;}
+.dash-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;box-shadow:0 1px 2px rgba(0,0,0,.06);}
+.dash-kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-bottom:5px;}
+.dash-kpi-val{font-size:28px;font-weight:300;color:var(--text);font-family:'JetBrains Mono',monospace;line-height:1;}
+.dash-kpi-sub{font-size:9.5px;color:var(--text3);margin-top:3px;}
+
+/* MODALS */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--surface);border-radius:var(--radius-lg);padding:22px;width:500px;max-width:96vw;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;}
+.modal-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin:12px 0 6px;}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+.btn-cancel{padding:6px 14px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;cursor:pointer;color:var(--text);}
+.btn-save{padding:6px 14px;background:var(--emea-banner);color:#fff;border:none;border-radius:var(--radius-sm);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;}
+.exception-row{display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--surface2);border-radius:var(--radius-sm);margin-bottom:5px;font-size:11px;}
+.exception-row span{flex:1;}
+.btn-rm-ex{background:none;border:none;color:#C82A2A;cursor:pointer;font-size:12px;}
+
+/* CUSTOM SHIFT MODAL */
+.custom-modal{width:380px;}
+
+/* GENERATE MODAL */
+.gen-modal{width:480px;}
+.gen-status{padding:10px 12px;border-radius:var(--radius-sm);font-size:12px;margin-bottom:10px;}
+.gen-status.running{background:#EEF4FF;color:#1A3A88;border:1px solid #AABFE8;}
+.gen-status.done{background:#E6F7EC;color:#0A5A20;border:1px solid #8ADAAA;}
+.gen-status.error{background:var(--ssickbg);color:#8A1010;border:1px solid var(--ssickb);}
+.gen-log{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text2);max-height:160px;overflow-y:auto;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;margin-top:8px;line-height:1.6;}
+
+.view{display:none;}
+.view.active{display:block;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="nav-icon">GR</div>
+    <span class="nav-name">Global Rota</span>
+  </div>
+  <div class="nav-div"></div>
+  <button class="nav-tab active" onclick="showView('rota',this)">Weekly Rota</button>
+  <button class="nav-tab" onclick="showView('directory',this)">Staff Directory</button>
+  <button class="nav-tab" onclick="showView('leave',this)">Leave Register</button>
+  <button class="nav-tab" onclick="showView('dashboard',this)">Dashboard</button>
+  <div class="nav-spacer"></div>
+  <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,.5)" id="syncStatus">
+    <div class="sync-dot" id="syncDot"></div><span id="syncText">Connected</span>
+  </div>
+  <div class="nav-div"></div>
+  <div class="week-nav" id="weekNavEl">
+    <button class="wbtn" onclick="changeWeek(-1)" title="Previous week">&#8249;</button>
+    <span class="wlabel" id="weekLabel">—</span>
+    <button class="wbtn" onclick="changeWeek(1)" title="Next week">&#8250;</button>
+    <button class="wbtn" onclick="jumpToToday()" title="Jump to current week" style="font-size:10px;width:auto;padding:0 6px">Today</button>
+  </div>
+  <button class="nbtn" onclick="openNS()">+ New Starter</button>
+  <button class="nbtn green" onclick="openGenModal()">⚡ Generate Week</button>
+</nav>
+
+<!-- TZ STRIP -->
+<div class="tz-strip">
+  <div class="tz-item">
+    <div class="tz-pip" style="background:#3A4EC8"></div>
+    <div class="tz-info"><span class="tz-region">🌍 EMEA</span><span class="tz-time" id="tzE">—</span><span class="tz-zone">BST · GMT+1</span></div>
+  </div>
+  <div class="tz-item">
+    <div class="tz-pip" style="background:#1A9E4A"></div>
+    <div class="tz-info"><span class="tz-region">🇺🇸 US</span><span class="tz-time" id="tzU">—</span><span class="tz-zone">EDT · GMT-4</span></div>
+  </div>
+  <div class="tz-item">
+    <div class="tz-pip" style="background:#E8621A"></div>
+    <div class="tz-info"><span class="tz-region">🇦🇺 AUS</span><span class="tz-time" id="tzA">—</span><span class="tz-zone">AEST · GMT+10</span></div>
+  </div>
+  <div class="tz-local" id="tzLocal"></div>
+</div>
+
+<!-- COVERAGE -->
+<div class="cov-strip" id="covStrip"></div>
+
+<!-- AMBER WARNINGS -->
+<div id="amberBox" style="display:none"></div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ROTA VIEW -->
+<div class="view active" id="view-rota">
+  <div class="search-bar">
+    <div class="search-input-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="rotaSearch" placeholder="Search name…" oninput="applySearch()">
+      <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+    </div>
+    <select class="filter-select" id="regionFilter" onchange="renderRota()">
+      <option value="ALL">All Regions</option>
+      <option value="EMEA">🌍 EMEA</option>
+      <option value="US">🇺🇸 US</option>
+      <option value="AUS">🇦🇺 AUS</option>
+    </select>
+    <span class="search-results-info" id="searchInfo"></span>
+  </div>
+  <div style="margin-top:10px">
+    <div class="page-header">
+      <div>
+        <div class="page-title" id="rotaTitle">Weekly Rota</div>
+        <div class="page-sub">Click any shift to edit · Manually set shifts are preserved when generating · Search by name above</div>
+      </div>
+    </div>
+    <div class="rota-card">
+      <div class="rota-scroll">
+        <table class="rota"><thead id="rotaHead"></thead><tbody id="rotaBody"></tbody></table>
+      </div>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-sw" style="background:var(--s08bg);border-color:var(--s08b)"></div>08:00–17:00</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--s09bg);border-color:var(--s09b)"></div>09:00–18:00</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--s093bg);border-color:var(--s093b)"></div>09:30–18:30</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--s10bg);border-color:var(--s10b)"></div>10:00–19:00</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--s14bg);border-color:var(--s14b)"></div>14:00–19:00</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--scustbg);border-color:var(--scustb)"></div>Custom Hours</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--stoilbg);border-color:var(--stoilb)"></div>TOIL</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--salbg);border-color:var(--salb)"></div>Annual Leave</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--ssickbg);border-color:var(--ssickb)"></div>Sick Leave</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--swfhbg);border-color:var(--swfhb)"></div>WFH</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--soffbg);border-color:var(--soffb)"></div>Day Off</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--sbhbg);border-color:var(--sbhb)"></div>Bank Holiday</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--sdepbg);border-color:var(--sdepb)"></div>Dependant Leave</div>
+        <div class="leg-item"><div class="leg-sw" style="background:var(--shcabg);border-color:var(--shcab)"></div>Health Care Appt</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTORY VIEW -->
+<div class="view" id="view-directory">
+  <div class="page-header">
+    <div><div class="page-title">Staff Directory</div><div class="page-sub">112 staff · Click Edit to update exceptions or shift rules</div></div>
+    <button class="nbtn primary" style="margin:0;border-radius:var(--radius-sm)" onclick="openNS()">+ Add New Starter</button>
+  </div>
+  <div class="dir-card">
+    <div class="dir-toolbar">
+      <input class="filter-select" style="min-width:200px;height:30px" type="text" id="dirSearch" placeholder="Search name, skill…" oninput="filterDir()">
+      <select class="filter-select" id="dirReg" onchange="filterDir()">
+        <option value="">All Regions</option>
+        <option value="EMEA">EMEA</option><option value="US">US</option><option value="AUS">AUS</option>
+      </select>
+      <select class="filter-select" id="dirSkill" onchange="filterDir()">
+        <option value="">All Skills</option>
+        <option>POS</option><option>POS/ESP</option><option>PAYMENTS</option>
+        <option>PAY/ESP</option><option>DIGITAL</option><option>TIER2</option>
+        <option>LEADER</option><option>TERRITORY MGR</option>
+      </select>
+      <span class="dir-count" id="dirCount">112 staff</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="dir">
+        <thead><tr>
+          <th style="width:32px">#</th><th>First</th><th>Last</th><th>Region</th>
+          <th>Skill</th><th>Default Shift</th><th>Contract</th><th>Notes / Exceptions</th><th>Edit</th>
+        </tr></thead>
+        <tbody id="dirBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- LEAVE VIEW -->
+<div class="view" id="view-leave">
+  <div class="page-header">
+    <div><div class="page-title">Leave Register</div><div class="page-sub">Pre-enter approved leave · Engine reads this before generating</div></div>
+  </div>
+  <div class="leave-wrap">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Add Leave Entry</span></div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="ff" style="flex:2;min-width:180px"><label>Staff Member</label><select id="leaveStaff" style="height:30px"></select></div>
+          <div class="ff"><label>Type</label>
+            <select id="leaveType">
+              <option value="AL">Annual Leave</option><option value="SICK">Sick Leave</option>
+              <option value="TOIL">TOIL</option><option value="DEP">Dependant Leave</option>
+              <option value="HCA">Health Care Appt</option><option value="BH">Bank Holiday</option>
+            </select>
+          </div>
+          <div class="ff"><label>From</label><input type="date" id="leaveFrom"></div>
+          <div class="ff"><label>To</label><input type="date" id="leaveTo"></div>
+          <div class="ff"><label>Notes</label><input type="text" id="leaveNote" placeholder="Optional…"></div>
+          <button class="btn-add" onclick="addLeave()">Add Entry</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <table class="leave">
+        <thead><tr><th>Name</th><th>Region</th><th>Skill</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="leaveBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD VIEW -->
+<div class="view" id="view-dashboard">
+  <div class="page-header">
+    <div><div class="page-title">Dashboard</div><div class="page-sub">Live headcount · Updates as shifts are edited</div></div>
+  </div>
+  <div class="dash-grid" id="dashKPIs"></div>
+  <div class="card"><table style="width:100%;border-collapse:collapse;font-size:11px">
+    <thead><tr id="dashHead"></tr></thead>
+    <tbody id="dashBody"></tbody>
+  </table></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- NEW STARTER MODAL -->
+<div class="modal-bg" id="nsModal">
+  <div class="modal">
+    <div class="modal-title">Add New Starter</div>
+    <div class="form-grid">
+      <div class="ff"><label>First Name</label><input type="text" id="nsFirst"></div>
+      <div class="ff"><label>Last Name</label><input type="text" id="nsLast"></div>
+    </div>
+    <div class="form-grid" style="margin-top:8px">
+      <div class="ff"><label>Region</label>
+        <select id="nsRegion"><option value="EMEA">EMEA</option><option value="US">US</option><option value="AUS">AUS</option></select>
+      </div>
+      <div class="ff"><label>Skill Group</label>
+        <select id="nsSkill">
+          <option value="POS">POS</option><option value="POS/ESP">POS/ESP</option>
+          <option value="PAYMENTS">PAYMENTS</option><option value="PAY/ESP">PAY/ESP</option>
+          <option value="DIGITAL">DIGITAL</option><option value="TIER2">Tier 2</option>
+          <option value="LEADER">Leader</option><option value="TERRITORY MGR">Territory Mgr</option>
+        </select>
+      </div>
+      <div class="ff"><label>Contract</label>
+        <select id="nsContract"><option value="5from7">5 from 7</option><option value="Mon-Fri">Mon–Fri only</option><option value="Specific">Specific</option></select>
+      </div>
+    </div>
+    <div class="form-grid" style="margin-top:8px">
+      <div class="ff"><label>Spanish Speaking</label>
+        <select id="nsEsp"><option value="0">No</option><option value="1">Yes</option></select>
+      </div>
+      <div class="ff"><label>No Weekends</label>
+        <select id="nsNoWE"><option value="0">No</option><option value="1">Yes</option></select>
+      </div>
+    </div>
+    <div class="ff" style="margin-top:8px"><label>Notes</label><input type="text" id="nsNotes" placeholder="Any special rules…"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('nsModal')">Cancel</button>
+      <button class="btn-save" onclick="saveNS()">Add to Rota</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT STAFF MODAL -->
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <div class="modal-title" id="editModalTitle">Edit Staff Member</div>
+    <input type="hidden" id="editStaffId">
+    <div class="form-grid">
+      <div class="ff"><label>First Name</label><input type="text" id="editFirst"></div>
+      <div class="ff"><label>Last Name</label><input type="text" id="editLast"></div>
+    </div>
+    <div class="form-grid" style="margin-top:8px">
+      <div class="ff"><label>Region</label>
+        <select id="editRegion"><option value="EMEA">EMEA</option><option value="US">US</option><option value="AUS">AUS</option></select>
+      </div>
+      <div class="ff"><label>Skill Group</label>
+        <select id="editSkill">
+          <option value="POS">POS</option><option value="POS/ESP">POS/ESP</option>
+          <option value="PAYMENTS">PAYMENTS</option><option value="PAY/ESP">PAY/ESP</option>
+          <option value="DIGITAL">DIGITAL</option><option value="TIER2">Tier 2</option>
+          <option value="LEADER">Leader</option><option value="TERRITORY MGR">Territory Mgr</option>
+        </select>
+      </div>
+      <div class="ff"><label>Contract</label>
+        <select id="editContract"><option value="5from7">5 from 7</option><option value="Mon-Fri">Mon–Fri only</option><option value="Specific">Specific</option></select>
+      </div>
+    </div>
+    <div class="form-grid" style="margin-top:8px">
+      <div class="ff"><label>Spanish Speaking</label>
+        <select id="editEsp"><option value="0">No</option><option value="1">Yes</option></select>
+      </div>
+      <div class="ff"><label>No Weekends</label>
+        <select id="editNoWE"><option value="0">No</option><option value="1">Yes</option></select>
+      </div>
+    </div>
+    <div class="ff" style="margin-top:8px"><label>Notes</label><input type="text" id="editNotes"></div>
+    <div class="modal-section">Shift Exceptions</div>
+    <div id="editExceptions"></div>
+    <div class="form-grid" style="margin-top:6px">
+      <div class="ff"><label>Day</label>
+        <select id="exDay">
+          <option value="MON">Monday</option><option value="TUE">Tuesday</option>
+          <option value="WED">Wednesday</option><option value="THU">Thursday</option>
+          <option value="FRI">Friday</option><option value="SAT">Saturday</option><option value="SUN">Sunday</option>
+        </select>
+      </div>
+      <div class="ff"><label>Fixed Shift</label>
+        <select id="exShift">
+          <option value="0800">08:00–17:00</option><option value="0900">09:00–18:00</option>
+          <option value="0930">09:30–18:30</option><option value="1000">10:00–19:00</option>
+          <option value="1400">14:00–19:00</option><option value="OFF">Day Off</option>
+          <option value="TOIL">TOIL</option>
+        </select>
+      </div>
+      <button class="btn-add" style="height:30px" onclick="addException()">+ Add</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('editModal')">Cancel</button>
+      <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM SHIFT MODAL -->
+<div class="modal-bg" id="customModal">
+  <div class="modal custom-modal">
+    <div class="modal-title">Set Custom Hours</div>
+    <div class="page-sub" style="margin-bottom:12px" id="customModalSub"></div>
+    <div class="form-grid">
+      <div class="ff"><label>Start Time</label><input type="time" id="customStart" value="11:00"></div>
+      <div class="ff"><label>End Time</label><input type="time" id="customEnd" value="14:00"></div>
+    </div>
+    <div class="ff" style="margin-top:8px"><label>Label (optional)</label><input type="text" id="customLabel" placeholder="e.g. Reduced hours, Overtime…"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('customModal')">Cancel</button>
+      <button class="btn-save" onclick="saveCustomShift()">Set Hours</button>
+    </div>
+  </div>
+</div>
+
+<!-- GENERATE MODAL -->
+<div class="modal-bg" id="genModal">
+  <div class="modal gen-modal">
+    <div class="modal-title">⚡ Generate Week — <span id="genWeekLabel"></span></div>
+    <div id="genStatus" class="gen-status running" style="display:none"></div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">
+      The engine will generate a full week respecting:<br>
+      <span style="color:var(--text3);font-size:11px">✓ 6-week rotation history &nbsp;✓ Weekend targets &nbsp;✓ TOIL placement &nbsp;✓ Pre-entered leave &nbsp;✓ Manual edits already made</span>
+    </div>
+    <div class="ff" style="margin-bottom:10px">
+      <label>Week commencing</label>
+      <select id="genWeekSelect" style="height:30px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;padding:0 8px"></select>
+    </div>
+    <div id="genLog" class="gen-log" style="display:none"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('genModal')">Close</button>
+      <button class="btn-save" id="genRunBtn" onclick="runEngine()">Generate Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// API CONFIG
+// ═══════════════════════════════════════════════
+const API = 'https://script.google.com/macros/s/AKfycby0YpLyJWEphqM3OBqTfA-6DWqpkK83siGIH0wi0JAEmY7-8A8X1_5eZq_elyQMDN6_Sg/exec';
+
+// All requests use GET with no-cors-triggering fetch to avoid CORS issues
+async function apiGet(params){
+  try{
+    const url=API+'?'+new URLSearchParams(params);
+    const r=await fetch(url,{redirect:'follow'});
+    const text=await r.text();
+    try{return JSON.parse(text);}catch{return{error:'Bad JSON: '+text.substring(0,100)};}
+  }catch(e){console.error('API GET error',e);return{error:e.toString()};}
+}
+// Write operations: encode data as JSON string in GET param
+async function apiPost(data){
+  try{
+    const params=new URLSearchParams();
+    params.append('action',data.action);
+    params.append('payload',JSON.stringify(data));
+    const url=API+'?'+params.toString();
+    const r=await fetch(url,{redirect:'follow'});
+    const text=await r.text();
+    try{return JSON.parse(text);}catch{return{error:'Bad JSON: '+text.substring(0,100)};}
+  }catch(e){console.error('API error',e);return{error:e.toString()};}
+}
+
+function setSyncing(){document.getElementById('syncDot').className='sync-dot syncing';document.getElementById('syncText').textContent='Saving…';}
+function setSynced(){document.getElementById('syncDot').className='sync-dot';document.getElementById('syncText').textContent='Saved';}
+function setSyncError(){document.getElementById('syncDot').className='sync-dot error';document.getElementById('syncText').textContent='Sync error';}
+
+// ═══════════════════════════════════════════════
+// STAFF DATA
+// ═══════════════════════════════════════════════
+let STAFF = [
+  {id:1,first:"Beth",last:"Hayland",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:2,first:"Thomas",last:"Forde",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:3,first:"Amy",last:"Hewitt",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:4,first:"James",last:"Bott",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:5,first:"Tyler",last:"River",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:6,first:"Rachael",last:"Selby",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:7,first:"Steven",last:"Spong",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:8,first:"Mia",last:"Ball",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:9,first:"Jodie",last:"Whitworth",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:10,first:"Harry",last:"Wilkinson",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:11,first:"Robert",last:"Ajisegbebe",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:12,first:"Andrei",last:"Motei",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:13,first:"Josh",last:"Barber",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:14,first:"Leah",last:"Powell",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:15,first:"Mohit",last:"Francis",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:16,first:"Mylim",last:"Taylor-Gray",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:17,first:"Ashton",last:"Woodall",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:18,first:"Jack R",last:"Ross",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:19,first:"Jack B",last:"Bramwell",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:20,first:"Jesse",last:"Easter",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:21,first:"Ilana",last:"Harrison",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:22,first:"Jodie H",last:"Durant",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:23,first:"Ayla",last:"Constance",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:24,first:"Scott",last:"Greenhalgh",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:25,first:"Niamh",last:"Woods",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:26,first:"Hayden",last:"Graves",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:27,first:"Shayla",last:"Secker",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:28,first:"Min",last:"Gifford",region:"EMEA",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:29,first:"Ale",last:"Felicita",region:"EMEA",skill:"POS/ESP",contract:"5from7",notes:"Spanish speaking",esp:true,noWeekend:false,exceptions:{}},
+  {id:30,first:"Alejandro",last:"Anaya",region:"EMEA",skill:"POS/ESP",contract:"5from7",notes:"Spanish speaking · 30min shorter shifts",esp:true,noWeekend:false,exceptions:{},shortShift:true},
+  {id:31,first:"Juan David",last:"Castro Langer",region:"EMEA",skill:"POS/ESP",contract:"5from7",notes:"Spanish speaking · 5hr shifts 7 days",esp:true,noWeekend:false,exceptions:{},fiveHour:true},
+  {id:32,first:"Samiha",last:"Gonzalez",region:"EMEA",skill:"POS/ESP",contract:"5from7",notes:"Spanish speaking",esp:true,noWeekend:false,exceptions:{}},
+  {id:33,first:"Lexell",last:"Garrido",region:"EMEA",skill:"POS/ESP",contract:"5from7",notes:"Spanish speaking",esp:true,noWeekend:false,exceptions:{}},
+  {id:34,first:"Maxwell",last:"Yates",region:"EMEA",skill:"POS/ESP",contract:"5from7",notes:"Spanish speaking",esp:true,noWeekend:false,exceptions:{}},
+  {id:35,first:"Hayden",last:"Dunmall",region:"EMEA",skill:"POS/ESP",contract:"5from7",notes:"Spanish speaking",esp:true,noWeekend:false,exceptions:{}},
+  {id:36,first:"Flo",last:"Sargisson",region:"EMEA",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:37,first:"Lorna",last:"Brooks",region:"EMEA",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:38,first:"Callum",last:"Guy",region:"EMEA",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:39,first:"Tyler",last:"Evans",region:"EMEA",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:40,first:"Keir",last:"Furlong",region:"EMEA",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:41,first:"Kaya",last:"Gordon",region:"EMEA",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:42,first:"Chloe",last:"Hamling",region:"EMEA",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:43,first:"Jess",last:"Tracey",region:"EMEA",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:44,first:"April",last:"Marinelli",region:"EMEA",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:45,first:"Alex",last:"Conley",region:"EMEA",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:46,first:"Jay",last:"Lakhman",region:"EMEA",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:47,first:"Aarya",last:"Bhadgaonkar",region:"EMEA",skill:"PAYMENTS",contract:"Specific",notes:"Mon/Tue 09:00–18:00 · Sat 10:00–14:00",esp:false,noWeekend:false,exceptions:{MON:'0900',TUE:'0900',WED:'OFF',THU:'OFF',FRI:'OFF',SAT:'1000',SUN:'OFF'}},
+  {id:48,first:"Archie",last:"Raybould",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:49,first:"Lewis",last:"Mortishire",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:50,first:"Megan",last:"Williamson",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:51,first:"John",last:"Hemsley",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:52,first:"Lily",last:"Miles",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:53,first:"Ozias",last:"Mhungu",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:54,first:"Philip",last:"Gardner",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:55,first:"Luca",last:"Valori",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:56,first:"Hamish",last:"Lusher",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:57,first:"Sophie",last:"Donaghy-McAndrew",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:58,first:"Carringan",last:"Matthews",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:59,first:"Mitchell",last:"Thomas",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:60,first:"Ryan",last:"Firth",region:"EMEA",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:61,first:"Jess",last:"Loome",region:"EMEA",skill:"TIER2",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:62,first:"James",last:"Slater",region:"EMEA",skill:"TIER2",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:63,first:"Ella",last:"McCarthy",region:"EMEA",skill:"TIER2",contract:"5from7",notes:"No weekends",esp:false,noWeekend:true,exceptions:{}},
+  {id:64,first:"Diego",last:"Ramalhete",region:"EMEA",skill:"TIER2",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:65,first:"Siyana",last:"Petrova",region:"EMEA",skill:"TIER2",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:66,first:"Tommy",last:"Nunn",region:"EMEA",skill:"TIER2",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:67,first:"Lily",last:"Elvin",region:"EMEA",skill:"TIER2",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:68,first:"Jake",last:"Gray",region:"EMEA",skill:"LEADER",contract:"5from7",notes:"1-in-5 weekends · Default 08:00",esp:false,noWeekend:false,exceptions:{}},
+  {id:69,first:"Alina",last:"Caras",region:"EMEA",skill:"LEADER",contract:"5from7",notes:"1-in-5 weekends",esp:false,noWeekend:false,exceptions:{}},
+  {id:70,first:"Layla",last:"Edwards",region:"EMEA",skill:"LEADER",contract:"5from7",notes:"1-in-5 weekends",esp:false,noWeekend:false,exceptions:{}},
+  {id:71,first:"Neal",last:"Smith",region:"EMEA",skill:"LEADER",contract:"5from7",notes:"1-in-5 weekends",esp:false,noWeekend:false,exceptions:{}},
+  {id:72,first:"Stacey",last:"Hargrave-Walker",region:"EMEA",skill:"LEADER",contract:"5from7",notes:"1-in-5 weekends · Default 10:00",esp:false,noWeekend:false,exceptions:{}},
+  {id:73,first:"Kieran",last:"Sarwar",region:"EMEA",skill:"TERRITORY MGR",contract:"Mon-Fri",notes:"Fixed Mon–Fri 09:00 only",esp:false,noWeekend:true,exceptions:{MON:'0900',TUE:'0900',WED:'0900',THU:'0900',FRI:'0900',SAT:'OFF',SUN:'OFF'}},
+  {id:74,first:"Tony",last:"Chen",region:"US",skill:"PAY/ESP",contract:"5from7",notes:"",esp:true,noWeekend:false,exceptions:{}},
+  {id:75,first:"Elizabeth",last:"Calderon",region:"US",skill:"PAY/ESP",contract:"5from7",notes:"",esp:true,noWeekend:false,exceptions:{}},
+  {id:76,first:"Amanda",last:"Medina",region:"US",skill:"PAY/ESP",contract:"5from7",notes:"",esp:true,noWeekend:false,exceptions:{}},
+  {id:77,first:"Christopher",last:"Salazar",region:"US",skill:"PAY/ESP",contract:"5from7",notes:"",esp:true,noWeekend:false,exceptions:{}},
+  {id:78,first:"Rayniel",last:"De Jesus",region:"US",skill:"PAY/ESP",contract:"5from7",notes:"",esp:true,noWeekend:false,exceptions:{}},
+  {id:79,first:"Adrien",last:"Santiago",region:"US",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:80,first:"Brian",last:"Nunez",region:"US",skill:"PAYMENTS",contract:"5from7",notes:"Flexible shift",esp:false,noWeekend:false,exceptions:{}},
+  {id:81,first:"Niaomi",last:"James",region:"US",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:82,first:"Mikel",last:"Penrod",region:"US",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:83,first:"Rachel",last:"Snodgrass-Neal",region:"US",skill:"PAYMENTS",contract:"5from7",notes:"Flexible shift",esp:false,noWeekend:false,exceptions:{}},
+  {id:84,first:"Eric",last:"Sepulveda",region:"US",skill:"PAYMENTS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:85,first:"David",last:"Block",region:"US",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:86,first:"Nicholas",last:"Ortega",region:"US",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:87,first:"Lijensky",last:"Raphael",region:"US",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:88,first:"Jeremiah",last:"Allen",region:"US",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:89,first:"Ajay",last:"Chadee",region:"US",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:90,first:"Mafalda",last:"Lomba",region:"US",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:91,first:"Emma",last:"Gidman",region:"US",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:92,first:"Alfonso",last:"Marquez",region:"US",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:93,first:"Akira",last:"Daniel",region:"US",skill:"DIGITAL",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:94,first:"Zach",last:"Baritell",region:"US",skill:"TIER2",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:95,first:"Jaydin",last:"Garcia",region:"US",skill:"TIER2",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:96,first:"Joel",last:"Llewelyn",region:"US",skill:"TIER2",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:97,first:"Kenny",last:"Sanon",region:"US",skill:"LEADER",contract:"5from7",notes:"Alternates weekends with Julio",esp:false,noWeekend:false,exceptions:{}},
+  {id:98,first:"Julio",last:"Ojeda",region:"US",skill:"LEADER",contract:"5from7",notes:"Alternates weekends with Kenny · Default 08:00",esp:false,noWeekend:false,exceptions:{}},
+  {id:99,first:"Adedoyin",last:"Adedipe",region:"AUS",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:100,first:"Thomas",last:"Butcher",region:"AUS",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:101,first:"Fernanda",last:"Da Costa Mosqueda",region:"AUS",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:102,first:"Samantha",last:"Kelly",region:"AUS",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:103,first:"Deepthipriya",last:"Laxmapuram",region:"AUS",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:104,first:"Ahmed",last:"Maqsood",region:"AUS",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:105,first:"Dami",last:"Odutola",region:"AUS",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:106,first:"Innocent",last:"Onoiribholo",region:"AUS",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:107,first:"Ingrid",last:"Tobar",region:"AUS",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:108,first:"Daniels",last:"Ezeofor",region:"AUS",skill:"POS/ESP",contract:"5from7",notes:"Spanish speaking",esp:true,noWeekend:false,exceptions:{}},
+  {id:109,first:"Lewis",last:"Glen",region:"AUS",skill:"TIER2",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:110,first:"Kevin",last:"Pineda Mejia",region:"AUS",skill:"TIER2",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:111,first:"Ahmed",last:"Yacoubou",region:"AUS",skill:"POS",contract:"5from7",notes:"",esp:false,noWeekend:false,exceptions:{}},
+  {id:112,first:"Dan",last:"Mills",region:"AUS",skill:"LEADER",contract:"Mon-Fri",notes:"Mon–Fri only",esp:false,noWeekend:true,exceptions:{}},
+];
+
+// ═══════════════════════════════════════════════
+// SHIFT CONFIG
+// ═══════════════════════════════════════════════
+const SD={
+  "0800":"08:00–17:00","0900":"09:00–18:00","0930":"09:30–18:30","1000":"10:00–19:00",
+  "1400":"14:00–19:00","0900_530":"09:00–17:30","0800_430":"08:00–16:30","1030_7":"10:30–19:00",
+  "5HR_9":"09:00–14:00","5HR_1":"13:00–18:00","5HR_2":"14:00–19:00",
+  "TOIL":"TOIL","AL":"Annual Leave","SICK":"Sick Leave","WFH":"WFH","OFF":"Day Off",
+  "BH":"Bank Holiday","DEP":"Dependant Leave","HCA":"Health Care Appt","OC":"On Call","CUST":"Custom Hours"
+};
+const SC={
+  "0800":"s08","0900":"s09","0930":"s093","1000":"s10","1400":"s14",
+  "0900_530":"s09","0800_430":"s08","1030_7":"s10",
+  "5HR_9":"s5hr","5HR_1":"s5hr","5HR_2":"s5hr",
+  "TOIL":"stoil","AL":"sal","SICK":"ssick","WFH":"swfh","OFF":"soff",
+  "BH":"sbh","DEP":"sdep","HCA":"shca","OC":"swfh","CUST":"scust"
+};
+const OPTS_EMEA=["0800","0900","1000","1400","TOIL","AL","SICK","WFH","BH","DEP","HCA","OC","OFF","CUST"];
+const OPTS_US=["0800","0900","0930","1000","TOIL","AL","SICK","WFH","BH","OFF","CUST"];
+const OPTS_AUS=["0800","TOIL","AL","SICK","WFH","BH","OFF","CUST"];
+const ON_SHIFT=new Set(["0800","0900","0930","1000","1400","WFH","0900_530","0800_430","1030_7","5HR_9","5HR_1","5HR_2","CUST"]);
+
+const RCFG={
+  EMEA:{label:"🌍 EMEA",tz:"BST·GMT+1",cls:"rr-emea",scls:"sr-emea",skills:["POS","POS/ESP","DIGITAL","PAYMENTS","TIER2","LEADER","TERRITORY MGR"]},
+  US:{label:"🇺🇸 US",tz:"EDT·GMT-4",cls:"rr-us",scls:"sr-us",skills:["PAY/ESP","PAYMENTS","POS","DIGITAL","TIER2","LEADER"]},
+  AUS:{label:"🇦🇺 AUS",tz:"AEST·GMT+10",cls:"rr-aus",scls:"sr-aus",skills:["POS","POS/ESP","TIER2","LEADER"]}
+};
+const SL={TIER2:"Tier 2","TERRITORY MGR":"Territory Mgr","POS/ESP":"POS/Spanish","PAY/ESP":"Pay/Spanish",LEADER:"Leaders"};
+const SP={
+  POS:{bg:"#EEF4FF",bc:"#AABFE8",tc:"#1A3A88"},
+  "POS/ESP":{bg:"#FFF0F0",bc:"#F0AAAA",tc:"#8A1A1A"},
+  "PAY/ESP":{bg:"#FFF0F0",bc:"#F0AAAA",tc:"#8A1A1A"},
+  PAYMENTS:{bg:"#F0FFF4",bc:"#80D4A0",tc:"#0A5A20"},
+  DIGITAL:{bg:"#F5F0FF",bc:"#C0A0E8",tc:"#4A1A8A"},
+  TIER2:{bg:"#FFF8EE",bc:"#E8C880",tc:"#7A4A00"},
+  LEADER:{bg:"#F0F8FF",bc:"#88C0E0",tc:"#0A3A5A"},
+  "TERRITORY MGR":{bg:"#F8F8F0",bc:"#C8C8A0",tc:"#4A4A10"}
+};
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let weekOffset=0;
+const sched={}; // staffId_date -> shift value
+const manuallySet=new Set(); // staffId_date keys set by leader
+let leaveList=[];
+let shiftHistory=[]; // {staffId, weekStart, shift}
+let rotationHistory={}; // staffId -> {early:n, mid:n, late:n}
+let weekendRotationPointer=0; // 0=Kenny, 1=Julio alternating for US leaders
+let customShiftTarget=null; // {staffId, date}
+let currentExceptions={};
+let amberWarnings=[];
+
+// ═══════════════════════════════════════════════
+// DATE UTILS
+// ═══════════════════════════════════════════════
+function getMon(off=0){
+  // Get today's date string in local time (avoids UTC timezone shift)
+  const now=new Date();
+  const localStr=now.getFullYear()+'-'+
+    String(now.getMonth()+1).padStart(2,'0')+'-'+
+    String(now.getDate()).padStart(2,'0');
+  // Parse back as local midnight
+  const today=new Date(localStr+'T00:00:00');
+  const day=today.getDay(); // 0=Sun,1=Mon...6=Sat
+  const daysBack=day===0?6:day-1;
+  const mon=new Date(today);
+  mon.setDate(today.getDate()-daysBack+off*7);
+  return mon;
+}
+function addD(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function fmt(d){
+  return d.getFullYear()+'-'+
+    String(d.getMonth()+1).padStart(2,'0')+'-'+
+    String(d.getDate()).padStart(2,'0');
+}
+function fmtDisp(d){return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});}
+function fmtWk(m){return 'WC '+m.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function isToday(d){const t=new Date();t.setHours(0,0,0,0);return d.getTime()===t.getTime();}
+function isWE(d){return d.getDay()===0||d.getDay()===6;}
+function dayCode(d){return['SUN','MON','TUE','WED','THU','FRI','SAT'][d.getDay()];}
+function isFirstOfMonth(d){return d.getDate()===1;}
+function isLastOfMonth(d){const n=new Date(d);n.setDate(n.getDate()+1);return n.getDate()===1;}
+
+// ═══════════════════════════════════════════════
+// CLOCKS
+// ═══════════════════════════════════════════════
+function clocks(){
+  const n=new Date();
+  const f=(tz)=>n.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit'});
+  document.getElementById('tzE').textContent=f('Europe/London');
+  document.getElementById('tzU').textContent=f('America/New_York');
+  document.getElementById('tzA').textContent=f('Australia/Sydney');
+  document.getElementById('tzLocal').textContent='Your local time: '+n.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+clocks();setInterval(clocks,30000);
+
+// ═══════════════════════════════════════════════
+// SHIFT LOGIC
+// ═══════════════════════════════════════════════
+function defShift(s,d){
+  const we=isWE(d),dc=dayCode(d);
+  if(s.exceptions&&s.exceptions[dc]) return s.exceptions[dc];
+  if(s.contract==='Mon-Fri'&&we) return 'OFF';
+  if(s.noWeekend&&we) return 'OFF';
+  if(we) return 'OFF';
+  if(s.fiveHour) return '5HR_2';
+  if(s.id===98) return '0800';
+  if(s.region==='AUS') return '0800';
+  return '0900';
+}
+function getShift(s,d){
+  const k=s.id+'_'+(d instanceof Date?fmt(d):d);
+  return sched[k]!==undefined?sched[k]:defShift(s,d instanceof Date?d:new Date(d));
+}
+function setShiftLocal(sid,ds,val,manual=true){
+  const k=sid+'_'+ds;
+  sched[k]=val;
+  if(manual) manuallySet.add(k);
+  renderCoverage();updateDashIfVisible();
+}
+async function setShiftAndSave(sid,ds,val){
+  setShiftLocal(sid,ds,val,true);
+  setSyncing();
+  const mon=getMon(weekOffset);
+  const res=await apiPost({action:'saveShift',staffId:sid,date:ds,shift:val,weekStart:fmt(mon)});
+  if(res&&res.success) setSynced(); else setSyncError();
+}
+function styleSelect(el){el.className='ss '+(SC[el.value]||'soff');}
+
+// ═══════════════════════════════════════════════
+// SCHEDULING ENGINE
+// ═══════════════════════════════════════════════
+function getRotationCounts(staffId){
+  return rotationHistory[staffId]||{early:0,mid:0,late:0};
+}
+function pickEMLShift(s,counts,targets){
+  // targets = {early:n, mid:n, late:n}
+  // Pick the most underrepresented shift weighted by target
+  const earlyDue=targets.early-counts.early;
+  const midDue=targets.mid-counts.mid;
+  const lateDue=targets.late-counts.late;
+  if(earlyDue>=lateDue&&earlyDue>=midDue) return '0800';
+  if(lateDue>=earlyDue&&lateDue>=midDue) return '1000';
+  return '0900';
+}
+function pick5HrShift(weekIndex){
+  const opts=['5HR_9','5HR_1','5HR_2'];
+  return opts[weekIndex%3];
+}
+function pickShortShift(baseShift){
+  if(baseShift==='0800') return '0800_430';
+  if(baseShift==='1000') return '1030_7';
+  return '0900_530';
+}
+
+function getEMEATargets(skill){
+  const targets={
+    POS:{early:5,mid:18,late:5},
+    'POS/ESP':{early:2,mid:3,late:2},
+    DIGITAL:{early:2,mid:7,late:2},
+    PAYMENTS:{early:3,mid:9,late:2},
+    TIER2:{early:2,mid:4,late:1},
+    LEADER:{early:1,mid:3,late:1},
+    'TERRITORY MGR':{early:0,mid:1,late:0}
+  };
+  return targets[skill]||{early:1,mid:1,late:1};
+}
+
+function getUSTargets(){return{early:6,mid:999,late:0};}
+
+function isTOILSafe(ds,skill,region){
+  const d=new Date(ds);
+  if(isWE(d)) return false;
+  if(isFirstOfMonth(d)||isLastOfMonth(d)) return false;
+  // Check day after bank holiday
+  const prev=addD(d,-1);
+  const prevStr=fmt(prev);
+  const isBHDay=leaveList.some(l=>l.type==='BH'&&l.from<=prevStr&&l.to>=prevStr);
+  if(isBHDay) return false;
+  return true;
+}
+
+function countOffOnDay(ds,skill,region){
+  const group=STAFF.filter(s=>s.skill===skill&&s.region===region);
+  return group.filter(s=>{
+    const sh=getShift(s,new Date(ds));
+    return['AL','SICK','TOIL','DEP','HCA','OFF','BH'].includes(sh);
+  }).length;
+}
+
+function findBestTOILDay(staffId,weekStart,skill,region,excludeKeys=[]){
+  const mon=new Date(weekStart);
+  const days=['1','2','3','4','5'].map((_,i)=>addD(mon,i));
+  const groupSize=STAFF.filter(s=>s.skill===skill&&s.region===region).length;
+  const cap=Math.ceil(groupSize*0.15)||1;
+  let best=null,bestScore=Infinity;
+  days.forEach(d=>{
+    const ds=fmt(d);
+    const k=staffId+'_'+ds;
+    if(excludeKeys.includes(k)) return;
+    if(sched[k]!==undefined&&manuallySet.has(k)) return;
+    if(!isTOILSafe(ds,skill,region)) return;
+    const offCount=countOffOnDay(ds,skill,region);
+    const score=offCount;
+    if(score<bestScore){bestScore=score;best=ds;}
+  });
+  // If no safe day, pick least bad
+  if(!best){
+    let leastBad=null,leastBadScore=Infinity;
+    days.forEach(d=>{
+      const ds=fmt(d);
+      const k=staffId+'_'+ds;
+      if(excludeKeys.includes(k)) return;
+      if(sched[k]!==undefined&&manuallySet.has(k)) return;
+      const offCount=countOffOnDay(ds,skill,region);
+      if(offCount<leastBadScore){leastBadScore=offCount;leastBad=ds;}
+      if(offCount>cap) amberWarnings.push(`⚠ TOIL cap exceeded — ${STAFF.find(s=>s.id===staffId)?.first} ${STAFF.find(s=>s.id===staffId)?.last}: ${fmtDisp(d)} (${Math.round((offCount/groupSize)*100)}% off in ${skill})`);
+    });
+    best=leastBad;
+  }
+  return best;
+}
+
+function runEngine(){
+  const genWeekStr=document.getElementById('genWeekSelect').value;
+  const mon=new Date(genWeekStr);
+  const weekStart=fmt(mon);
+  const nextWeekStart=fmt(addD(mon,7));
+  const days=Array.from({length:7},(_,i)=>addD(mon,i));
+  const weekIndex=weekOffset;
+  amberWarnings=[];
+  const log=[];
+  const logEl=document.getElementById('genLog');
+  logEl.style.display='block';
+  const statusEl=document.getElementById('genStatus');
+  statusEl.style.display='block';
+  statusEl.className='gen-status running';
+  statusEl.textContent='⚡ Generating week…';
+  document.getElementById('genRunBtn').disabled=true;
+
+  function addLog(msg){log.push(msg);logEl.innerHTML=log.join('<br>');}
+
+  addLog('Reading leave register…');
+  // Apply leave to sched (non-manually-set cells)
+  leaveList.forEach(l=>{
+    let d=new Date(l.from),end=new Date(l.to);
+    while(d<=end){
+      const ds=fmt(d);
+      const k=l.staffId+'_'+ds;
+      if(!manuallySet.has(k)) sched[k]=l.type;
+      d=addD(d,1);
+    }
+  });
+
+  addLog('Assigning EMEA shift rotations…');
+  // EMEA rotation
+  ['POS','POS/ESP','DIGITAL','PAYMENTS','TIER2','LEADER'].forEach(skill=>{
+    const group=STAFF.filter(s=>s.region==='EMEA'&&s.skill===skill&&!s.fiveHour&&s.contract!=='Specific'&&s.contract!=='Mon-Fri');
+    const targets=getEMEATargets(skill);
+    let earlyCount=0,midCount=0,lateCount=0;
+    // Sort by most underdue
+    group.sort((a,b)=>{
+      const ca=getRotationCounts(a.id),cb=getRotationCounts(b.id);
+      const scoreA=(targets.early-ca.early)-(targets.mid-ca.mid);
+      const scoreB=(targets.early-cb.early)-(targets.mid-cb.mid);
+      return scoreB-scoreA;
+    });
+    group.forEach((s,idx)=>{
+      let assignedShift;
+      if(earlyCount<targets.early) {assignedShift='0800';earlyCount++;}
+      else if(lateCount<targets.late) {assignedShift='1000';lateCount++;}
+      else {assignedShift='0900';midCount++;}
+      if(s.shortShift) assignedShift=pickShortShift(assignedShift);
+      // Apply Mon-Fri
+      days.slice(0,5).forEach(d=>{
+        const ds=fmt(d);
+        const k=s.id+'_'+ds;
+        if(!manuallySet.has(k)&&sched[k]===undefined){
+          sched[k]=assignedShift;
+        }
+      });
+      // Update history
+      if(!rotationHistory[s.id]) rotationHistory[s.id]={early:0,mid:0,late:0};
+      if(assignedShift==='0800'||assignedShift==='0800_430') rotationHistory[s.id].early++;
+      else if(assignedShift==='1000'||assignedShift==='1030_7') rotationHistory[s.id].late++;
+      else rotationHistory[s.id].mid++;
+      // Prune to 6 weeks
+      const total=rotationHistory[s.id].early+rotationHistory[s.id].mid+rotationHistory[s.id].late;
+      if(total>6){const oldest=Math.min(rotationHistory[s.id].early,1);rotationHistory[s.id].early=Math.max(0,rotationHistory[s.id].early-oldest);}
+    });
+  });
+
+  // Juan David - 5hr shifts 7 days
+  const juan=STAFF.find(s=>s.id===31);
+  if(juan){
+    const fiveHrOpts=['5HR_9','5HR_1','5HR_2'];
+    const pick=fiveHrOpts[weekIndex%3];
+    days.forEach(d=>{
+      const ds=fmt(d);const k=juan.id+'_'+ds;
+      if(!manuallySet.has(k)) sched[k]=pick;
+    });
+    addLog('Juan David: '+SD[pick]+' all 7 days');
+  }
+
+  // Kieran - fixed 09:00 Mon-Fri
+  const kieran=STAFF.find(s=>s.id===73);
+  if(kieran){
+    days.forEach(d=>{
+      const ds=fmt(d);const k=kieran.id+'_'+ds;
+      if(!manuallySet.has(k)) sched[k]=isWE(d)?'OFF':'0900';
+    });
+  }
+
+  // Aarya - specific contract
+  const aarya=STAFF.find(s=>s.id===47);
+  if(aarya){
+    days.forEach(d=>{
+      const ds=fmt(d);const k=aarya.id+'_'+ds;const dc=dayCode(d);
+      if(!manuallySet.has(k)){
+        if(dc==='MON'||dc==='TUE') sched[k]='0900';
+        else if(dc==='SAT') sched[k]='1000';
+        else sched[k]='OFF';
+      }
+    });
+  }
+
+  addLog('Assigning US shift rotations…');
+  // US rotation
+  ['PAY/ESP','PAYMENTS','POS','DIGITAL','TIER2'].forEach(skill=>{
+    const group=STAFF.filter(s=>s.region==='US'&&s.skill===skill);
+    const earlyTarget=Math.min(6,group.length);
+    let earlyCount=0;
+    group.sort((a,b)=>{
+      const ca=getRotationCounts(a.id),cb=getRotationCounts(b.id);
+      return (ca.early)-(cb.early);
+    });
+    group.forEach(s=>{
+      const assignedShift=earlyCount<earlyTarget?'0800':'0900';
+      earlyCount++;
+      days.slice(0,5).forEach(d=>{
+        const ds=fmt(d);const k=s.id+'_'+ds;
+        if(!manuallySet.has(k)&&sched[k]===undefined) sched[k]=assignedShift;
+      });
+      if(!rotationHistory[s.id]) rotationHistory[s.id]={early:0,mid:0,late:0};
+      if(assignedShift==='0800') rotationHistory[s.id].early++;
+      else rotationHistory[s.id].mid++;
+    });
+  });
+
+  // US Leaders - alternate weekends
+  const kenny=STAFF.find(s=>s.id===97);
+  const julio=STAFF.find(s=>s.id===98);
+  const usLeaderWeekend=weekendRotationPointer%2===0?kenny:julio;
+  const usLeaderOff=weekendRotationPointer%2===0?julio:kenny;
+  [kenny,julio].forEach(s=>{
+    if(!s) return;
+    days.slice(0,5).forEach(d=>{
+      const ds=fmt(d);const k=s.id+'_'+ds;
+      if(!manuallySet.has(k)&&sched[k]===undefined) sched[k]='0900';
+    });
+  });
+  if(usLeaderWeekend){
+    [5,6].forEach(i=>{
+      const d=days[i];const ds=fmt(d);const k=usLeaderWeekend.id+'_'+ds;
+      if(!manuallySet.has(k)) sched[k]='0900';
+    });
+    addLog(`US Leaders: ${usLeaderWeekend.first} on weekend, ${usLeaderOff?.first} off`);
+  }
+
+  addLog('Assigning EMEA weekend shifts…');
+  // EMEA weekends - assign targets
+  const emeaWETargets={
+    SAT:{POS:{total:14,early:4,mid:10},'POS/ESP':{total:2,early:1,mid:1},DIGITAL:{total:2,early:1,mid:1},PAYMENTS:{total:3,early:1,mid:2},TIER2:{total:1},LEADER:{total:1}},
+    SUN:{POS:{total:5,early:2,mid:3},'POS/ESP':{total:2,early:1,mid:1},DIGITAL:{total:2,early:1,mid:1},PAYMENTS:{total:2,early:1,mid:1},TIER2:{total:1},LEADER:{total:1}}
+  };
+  ['SAT','SUN'].forEach(dayC=>{
+    const d=days[dayC==='SAT'?5:6];
+    const ds=fmt(d);
+    Object.entries(emeaWETargets[dayC]).forEach(([skill,tgt])=>{
+      const group=STAFF.filter(s=>s.region==='EMEA'&&s.skill===skill&&!s.noWeekend&&s.id!==47);
+      let assigned=0;
+      group.forEach(s=>{
+        const k=s.id+'_'+ds;
+        if(manuallySet.has(k)||sched[k]!==undefined) return;
+        if(assigned<(tgt.total||1)){
+          sched[k]=assigned<(tgt.early||0)?'0800':'0900';
+          assigned++;
+        } else {
+          sched[k]='OFF';
+        }
+      });
+    });
+  });
+
+  addLog('Placing TOIL days…');
+  // TOIL placement for weekend workers
+  STAFF.filter(s=>s.region==='EMEA'&&s.contract==='5from7'&&!s.noWeekend&&!s.fiveHour&&s.contract!=='Specific').forEach(s=>{
+    const satKey=s.id+'_'+fmt(days[5]);
+    const sunKey=s.id+'_'+fmt(days[6]);
+    const worksWE=(sched[satKey]&&sched[satKey]!=='OFF')||(sched[sunKey]&&sched[sunKey]!=='OFF');
+    if(!worksWE) return;
+    // TOIL day same week
+    const toilDay1=findBestTOILDay(s.id,weekStart,s.skill,'EMEA',[]);
+    if(toilDay1){sched[s.id+'_'+toilDay1]='TOIL';}
+    // TOIL day following week
+    const toilDay2=findBestTOILDay(s.id,nextWeekStart,s.skill,'EMEA',[]);
+    if(toilDay2){sched[s.id+'_'+toilDay2]='TOIL';}
+  });
+
+  // AUS - Mon-Fri only
+  addLog('Setting AUS Mon–Fri defaults…');
+  STAFF.filter(s=>s.region==='AUS').forEach(s=>{
+    days.forEach(d=>{
+      const ds=fmt(d);const k=s.id+'_'+ds;
+      if(!manuallySet.has(k)&&sched[k]===undefined){
+        sched[k]=isWE(d)?'OFF':'0800';
+      }
+    });
+  });
+
+  // Show amber warnings
+  if(amberWarnings.length){
+    const box=document.getElementById('amberBox');
+    box.style.display='block';
+    box.innerHTML=`<div class="ambers">${amberWarnings.map(w=>`<div class="amber-item">⚠️ ${w}</div>`).join('')}</div>`;
+  } else {
+    document.getElementById('amberBox').style.display='none';
+  }
+
+  addLog('Saving to Google Sheets…');
+  const shifts=[];
+  STAFF.forEach(s=>{
+    days.forEach(d=>{
+      const ds=fmt(d);const k=s.id+'_'+ds;
+      if(sched[k]) shifts.push({staffId:s.id,date:ds,shift:sched[k]});
+    });
+  });
+
+  async function saveBatched(allShifts){
+    const batchSize=40;
+    for(let i=0;i<allShifts.length;i+=batchSize){
+      const batch=allShifts.slice(i,i+batchSize);
+      const res=await apiPost({action:'saveWeek',weekStart,shifts:batch});
+      if(!res||res.error){return false;}
+      addLog('Saved '+Math.min(i+batchSize,allShifts.length)+'/'+allShifts.length+' shifts…');
+    }
+    return true;
+  }
+
+  saveBatched(shifts).then(ok=>{
+    if(ok){
+      statusEl.className='gen-status done';
+      statusEl.textContent='✓ Week generated and saved successfully';
+      addLog('✓ Done — '+shifts.length+' shifts saved to Google Sheets');
+      setSynced();
+    } else {
+      statusEl.className='gen-status error';
+      statusEl.textContent='⚠ Generated locally but could not save to Sheets';
+      setSyncError();
+    }
+    document.getElementById('genRunBtn').disabled=false;
+    weekendRotationPointer++;
+    renderRota();
+    updateDashIfVisible();
+  });
+}
+
+// ═══════════════════════════════════════════════
+// RENDER ROTA
+// ═══════════════════════════════════════════════
+function renderRota(){
+  const mon=getMon(weekOffset);
+  const wl=fmtWk(mon);
+  document.getElementById('rotaTitle').textContent=wl;
+  document.getElementById('weekLabel').textContent=wl;
+  const days=Array.from({length:7},(_,i)=>addD(mon,i));
+  const DN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const rf=document.getElementById('regionFilter').value;
+
+  let h=`<tr><th class="th-skill">Skill</th><th class="th-name">First</th><th class="th-surn">Last</th>`;
+  days.forEach((d,i)=>{const c=isToday(d)?'th-today':(isWE(d)?'th-we':'');h+=`<th class="${c} th-day">${DN[i]}</th>`;});
+  h+=`</tr><tr class="date-row"><th></th><th></th><th></th>`;
+  days.forEach(d=>{const c=isToday(d)?'th-today':(isWE(d)?'th-we':'');h+=`<th class="${c}">${fmtDisp(d)}</th>`;});
+  h+=`</tr>`;
+  document.getElementById('rotaHead').innerHTML=h;
+
+  let body='';
+  ['EMEA','US','AUS'].forEach(region=>{
+    if(rf!=='ALL'&&rf!==region) return;
+    const rc=RCFG[region];
+    const rs=STAFF.filter(s=>s.region===region);
+    body+=`<tr class="region-row ${rc.cls}"><td colspan="10">${rc.label} <span style="font-weight:400;font-size:10px;opacity:.7">${rc.tz} · ${rs.length} staff</span></td></tr>`;
+    rc.skills.forEach(skill=>{
+      const grp=rs.filter(s=>s.skill===skill);
+      if(!grp.length) return;
+      const lbl=SL[skill]||skill;
+      body+=`<tr class="skill-row ${rc.scls}"><td colspan="10" style="padding-left:14px">${lbl} <span style="opacity:.5;font-weight:500">(${grp.length})</span></td></tr>`;
+      const opts=region==='EMEA'?OPTS_EMEA:(region==='US'?OPTS_US:OPTS_AUS);
+      grp.forEach(s=>{
+        body+=`<tr class="staff-row" data-name="${(s.first+' '+s.last).toLowerCase()}" data-region="${region}">`;
+        body+=`<td class="cell-skill">${skill==='TERRITORY MGR'?'TERR':skill}</td>`;
+        const dot=s.esp?`<span class="esp-dot" title="Spanish speaking"></span>`:'';
+        body+=`<td class="cell-first">${dot}${s.first}</td><td class="cell-last">${s.last}</td>`;
+        days.forEach(d=>{
+          const shift=getShift(s,d);
+          const cls=isToday(d)?'td-today':(isWE(d)?'td-we':'');
+          const ds=fmt(d);
+          const isManual=manuallySet.has(s.id+'_'+ds);
+          const dispLabel=shift==='CUST'?(customShiftLabels[s.id+'_'+ds]||'Custom'):( SD[shift]||shift);
+          body+=`<td class="${cls}">`;
+          if(shift==='CUST'){
+            body+=`<div class="ss scust" style="display:flex;align-items:center;justify-content:center;cursor:pointer;height:24px" onclick="openCustom(${s.id},'${ds}','${s.first} ${s.last}')" title="Click to edit custom hours">${dispLabel}</div>`;
+          } else {
+            body+=`<select class="ss ${SC[shift]||'soff'}" onchange="handleShiftChange(this,${s.id},'${ds}')" title="${isManual?'Manually set':''}" style="${isManual?'outline:2px solid rgba(100,100,255,.3);outline-offset:1px':''}">`;
+            opts.forEach(o=>{
+              const lbl2=o==='CUST'?'Custom Hours…':(SD[o]||o);
+              body+=`<option value="${o}"${shift===o?' selected':''}>${lbl2}</option>`;
+            });
+            body+=`</select>`;
+          }
+          body+=`</td>`;
+        });
+        body+=`</tr>`;
+      });
+    });
+  });
+  document.getElementById('rotaBody').innerHTML=body;
+  applySearch();
+  renderCoverage();
+}
+
+function handleShiftChange(el,sid,ds){
+  if(el.value==='CUST'){
+    const s=STAFF.find(x=>x.id===sid);
+    openCustom(sid,ds,s?s.first+' '+s.last:'');
+    styleSelect(el);
+    return;
+  }
+  styleSelect(el);
+  setShiftAndSave(sid,ds,el.value);
+}
+
+// ═══════════════════════════════════════════════
+// CUSTOM SHIFT
+// ═══════════════════════════════════════════════
+const customShiftLabels={};
+function openCustom(sid,ds,name){
+  customShiftTarget={sid,ds};
+  document.getElementById('customModalSub').textContent=name+' · '+fmtDisp(new Date(ds));
+  document.getElementById('customStart').value='11:00';
+  document.getElementById('customEnd').value='14:00';
+  document.getElementById('customLabel').value='';
+  openModal('customModal');
+}
+function saveCustomShift(){
+  if(!customShiftTarget) return;
+  const {sid,ds}=customShiftTarget;
+  const start=document.getElementById('customStart').value;
+  const end=document.getElementById('customEnd').value;
+  const label=document.getElementById('customLabel').value||`${start}–${end}`;
+  customShiftLabels[sid+'_'+ds]=label;
+  setShiftAndSave(sid,ds,'CUST');
+  closeModal('customModal');
+  renderRota();
+}
+
+// ═══════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════
+function applySearch(){
+  const q=document.getElementById('rotaSearch').value.toLowerCase().trim();
+  const clearBtn=document.getElementById('searchClear');
+  const info=document.getElementById('searchInfo');
+  clearBtn.style.display=q?'block':'none';
+  if(!q){
+    document.querySelectorAll('.staff-row').forEach(r=>r.classList.remove('hidden-row'));
+    document.querySelectorAll('.region-row,.skill-row').forEach(r=>r.style.display='');
+    info.textContent='';
+    return;
+  }
+  let found=0;
+  document.querySelectorAll('.staff-row').forEach(r=>{
+    const name=r.dataset.name||'';
+    const match=name.includes(q);
+    r.classList.toggle('hidden-row',!match);
+    if(match) found++;
+  });
+  info.textContent=found===0?`No results for "${q}"`:`${found} result${found!==1?'s':''}`;
+  // Hide skill rows with no visible members
+  document.querySelectorAll('.skill-row').forEach(sr=>{
+    let next=sr.nextElementSibling;
+    let hasVisible=false;
+    while(next&&!next.classList.contains('skill-row')&&!next.classList.contains('region-row')){
+      if(next.classList.contains('staff-row')&&!next.classList.contains('hidden-row')) hasVisible=true;
+      next=next.nextElementSibling;
+    }
+    sr.style.display=hasVisible?'':'none';
+  });
+  // Hide region rows with no visible members
+  document.querySelectorAll('.region-row').forEach(rr=>{
+    let next=rr.nextElementSibling;
+    let hasVisible=false;
+    while(next&&!next.classList.contains('region-row')){
+      if(next.classList.contains('staff-row')&&!next.classList.contains('hidden-row')) hasVisible=true;
+      next=next.nextElementSibling;
+    }
+    rr.style.display=hasVisible?'':'none';
+  });
+}
+function clearSearch(){
+  document.getElementById('rotaSearch').value='';
+  applySearch();
+}
+
+// ═══════════════════════════════════════════════
+// COVERAGE STRIP
+// ═══════════════════════════════════════════════
+function renderCoverage(){
+  const mon=getMon(weekOffset);
+  let cd=addD(mon,0);
+  for(let i=0;i<5;i++){const d=addD(mon,i);if(isToday(d)){cd=d;break;}}
+  let html='';
+  ['EMEA','US','AUS'].forEach(region=>{
+    const rc=RCFG[region];
+    const rs=STAFF.filter(s=>s.region===region);
+    const totalOn=rs.filter(s=>ON_SHIFT.has(getShift(s,cd))).length;
+    const pillStyle=region==='EMEA'?`background:var(--emea-soft);color:var(--emea-text);border-color:var(--emea-soft)`
+      :(region==='US'?`background:var(--us-soft);color:var(--us-text);border-color:var(--us-soft)`
+      :`background:var(--aus-soft);color:var(--aus-text);border-color:var(--aus-soft)`);
+    html+=`<div class="cov-region"><div class="cov-rh">
+      <span class="cov-rname" style="${pillStyle}">${rc.label}</span>
+      <span class="cov-total">${totalOn}/${rs.length} on</span>
+    </div><div class="cov-pills">`;
+    rc.skills.forEach(skill=>{
+      const grp=rs.filter(s=>s.skill===skill);
+      if(!grp.length) return;
+      const on=grp.filter(s=>ON_SHIFT.has(getShift(s,cd))).length;
+      const p=SP[skill]||{bg:'#F0F0EE',bc:'#CCCCAA',tc:'#444422'};
+      const lbl=SL[skill]||skill;
+      const warn=on===0?'outline:2px solid #E88;outline-offset:1px':'';
+      html+=`<div class="cov-pill" style="background:${p.bg};border-color:${p.bc};color:${p.tc};${warn}">
+        <span class="cov-pill-l">${lbl}</span><span class="cov-pill-n">${on}</span>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  document.getElementById('covStrip').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════
+// WEEK NAV
+// ═══════════════════════════════════════════════
+function changeWeek(d){
+  weekOffset=Math.max(0,Math.min(11,weekOffset+d));
+  loadWeekFromSheets();
+}
+function jumpToToday(){
+  weekOffset=0;loadWeekFromSheets();
+}
+async function loadWeekFromSheets(){
+  const mon=getMon(weekOffset);
+  const weekStart=fmt(mon);
+  setSyncing();
+  try{
+    const data=await apiGet({action:'getWeek',weekStart});
+    if(data&&!data.error){
+      Object.entries(data).forEach(([k,v])=>{sched[k]=v;});
+    }
+    setSynced();
+  }catch(e){setSyncError();}
+  renderRota();
+}
+
+// ═══════════════════════════════════════════════
+// DIRECTORY
+// ═══════════════════════════════════════════════
+function renderDir(staff){
+  const rows=staff||STAFF;
+  document.getElementById('dirCount').textContent=rows.length+' staff';
+  document.getElementById('dirBody').innerHTML=rows.map(s=>`
+    <tr>
+      <td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:10px">${s.id}</td>
+      <td style="font-weight:600">${s.esp?`<span class="esp-dot"></span>`:''}${s.first}</td>
+      <td>${s.last}</td>
+      <td><span class="reg-badge rb-${s.region}">${s.region}</span></td>
+      <td><span class="sk-badge">${s.skill}</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2)">${defShiftLbl(s)}</td>
+      <td style="color:var(--text3);font-size:11px">${s.contract}</td>
+      <td style="font-size:10px;color:var(--text3);max-width:180px">${s.notes||'—'}${s.noWeekend?' · No WE':''}</td>
+      <td><button class="edit-btn" onclick="openEdit(${s.id})">Edit</button></td>
+    </tr>`).join('');
+}
+function defShiftLbl(s){
+  if(s.fiveHour) return '5hr rotation (7 days)';
+  if(s.shortShift) return '30min shorter rotation';
+  if(s.id===47) return 'Mon/Tue 09:00 + Sat 10:00';
+  if(s.id===98) return '08:00 (default)';
+  if(s.region==='AUS') return '08:00 local';
+  if(s.contract==='Mon-Fri') return '09:00 Mon–Fri';
+  return 'Rotation';
+}
+function filterDir(){
+  const q=document.getElementById('dirSearch').value.toLowerCase();
+  const r=document.getElementById('dirReg').value;
+  const sk=document.getElementById('dirSkill').value;
+  renderDir(STAFF.filter(s=>{
+    const n=(s.first+' '+s.last).toLowerCase();
+    return(!q||n.includes(q)||s.skill.toLowerCase().includes(q))&&(!r||s.region===r)&&(!sk||s.skill===sk);
+  }));
+}
+
+// ═══════════════════════════════════════════════
+// EDIT STAFF
+// ═══════════════════════════════════════════════
+function openEdit(id){
+  const s=STAFF.find(x=>x.id===id);
+  if(!s) return;
+  currentExceptions={...s.exceptions};
+  document.getElementById('editStaffId').value=id;
+  document.getElementById('editModalTitle').textContent=`Edit — ${s.first} ${s.last}`;
+  document.getElementById('editFirst').value=s.first;
+  document.getElementById('editLast').value=s.last;
+  document.getElementById('editRegion').value=s.region;
+  document.getElementById('editSkill').value=s.skill;
+  document.getElementById('editContract').value=s.contract;
+  document.getElementById('editEsp').value=s.esp?'1':'0';
+  document.getElementById('editNoWE').value=s.noWeekend?'1':'0';
+  document.getElementById('editNotes').value=s.notes||'';
+  renderExceptions();
+  openModal('editModal');
+}
+function renderExceptions(){
+  const div=document.getElementById('editExceptions');
+  const entries=Object.entries(currentExceptions);
+  if(!entries.length){div.innerHTML='<div style="font-size:11px;color:var(--text3);padding:4px 0">No exceptions set</div>';return;}
+  div.innerHTML=entries.map(([day,shift])=>`
+    <div class="exception-row">
+      <span style="font-weight:600;min-width:36px">${day}</span>
+      <span>${SD[shift]||shift}</span>
+      <button class="btn-rm-ex" onclick="removeException('${day}')">✕</button>
+    </div>`).join('');
+}
+function addException(){
+  const day=document.getElementById('exDay').value;
+  const shift=document.getElementById('exShift').value;
+  currentExceptions[day]=shift;
+  renderExceptions();
+}
+function removeException(day){
+  delete currentExceptions[day];
+  renderExceptions();
+}
+async function saveEdit(){
+  const id=parseInt(document.getElementById('editStaffId').value);
+  const s=STAFF.find(x=>x.id===id);
+  if(!s) return;
+  s.first=document.getElementById('editFirst').value.trim();
+  s.last=document.getElementById('editLast').value.trim();
+  s.region=document.getElementById('editRegion').value;
+  s.skill=document.getElementById('editSkill').value;
+  s.contract=document.getElementById('editContract').value;
+  s.esp=document.getElementById('editEsp').value==='1';
+  s.noWeekend=document.getElementById('editNoWE').value==='1';
+  s.notes=document.getElementById('editNotes').value;
+  s.exceptions=currentExceptions;
+  closeModal('editModal');
+  renderDir();renderRota();
+  setSyncing();
+  const res=await apiPost({action:'updateStaff',staff:s});
+  if(res&&res.success) setSynced(); else setSyncError();
+}
+
+// ═══════════════════════════════════════════════
+// LEAVE
+// ═══════════════════════════════════════════════
+function populateLeaveStaff(){
+  document.getElementById('leaveStaff').innerHTML=
+    STAFF.map(s=>`<option value="${s.id}">${s.first} ${s.last} (${s.region}·${s.skill})</option>`).join('');
+}
+async function addLeave(){
+  const sid=parseInt(document.getElementById('leaveStaff').value);
+  const s=STAFF.find(x=>x.id===sid);
+  const type=document.getElementById('leaveType').value;
+  const from=document.getElementById('leaveFrom').value;
+  const to=document.getElementById('leaveTo').value||from;
+  if(!from){alert('Please select a date.');return;}
+  const days=Math.round((new Date(to)-new Date(from))/86400000)+1;
+  const entry={staffId:sid,name:`${s.first} ${s.last}`,region:s.region,skill:s.skill,type,from,to,days,notes:document.getElementById('leaveNote').value};
+  setSyncing();
+  const res=await apiPost({action:'saveLeave',...entry});
+  if(res&&res.id) entry.id=res.id;
+  leaveList.push(entry);
+  let d=new Date(from),end=new Date(to);
+  while(d<=end){sched[sid+'_'+fmt(d)]=type;d=addD(d,1);}
+  renderLeave();renderCoverage();updateDashIfVisible();
+  if(res&&res.success) setSynced(); else setSyncError();
+}
+async function removeLeave(i){
+  const e=leaveList[i];
+  leaveList.splice(i,1);
+  renderLeave();
+  if(e.id){
+    setSyncing();
+    const res=await apiPost({action:'deleteLeave',id:e.id});
+    if(res&&res.success) setSynced(); else setSyncError();
+  }
+}
+const LBL={AL:'Annual Leave',SICK:'Sick Leave',TOIL:'TOIL',DEP:'Dependant Leave',HCA:'Health Care Appt',BH:'Bank Holiday'};
+function renderLeave(){
+  const body=document.getElementById('leaveBody');
+  if(!leaveList.length){
+    body.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text3);font-size:12px">No leave entries. Add above to pre-populate the rota.</td></tr>`;return;
+  }
+  body.innerHTML=leaveList.map((e,i)=>`
+    <tr>
+      <td style="font-weight:600">${e.name}</td>
+      <td><span class="reg-badge rb-${e.region}">${e.region}</span></td>
+      <td><span class="sk-badge">${e.skill}</span></td>
+      <td><span class="lt-badge ${SC[e.type]||'soff'}">${LBL[e.type]||e.type}</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${e.from}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:10px">${e.to}</td>
+      <td style="text-align:center;font-weight:600">${e.days}</td>
+      <td style="font-size:10px;color:var(--text3)">${e.notes||'—'}</td>
+      <td><button class="btn-del" onclick="removeLeave(${i})">✕</button></td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════
+function updateDashIfVisible(){
+  if(document.getElementById('view-dashboard').classList.contains('active')) updateDash();
+}
+function updateDash(){
+  const mon=getMon(weekOffset);
+  const days=Array.from({length:7},(_,i)=>addD(mon,i));
+  const DN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let ton=0,tleave=0,tsick=0;
+  STAFF.forEach(s=>days.slice(0,5).forEach(d=>{
+    const sh=getShift(s,d);
+    if(ON_SHIFT.has(sh)) ton++;
+    else if(['AL','DEP','HCA'].includes(sh)) tleave++;
+    else if(sh==='SICK') tsick++;
+  }));
+  document.getElementById('dashKPIs').innerHTML=`
+    <div class="dash-kpi"><div class="dash-kpi-label">On Shift (daily avg)</div><div class="dash-kpi-val">${Math.round(ton/5)}</div><div class="dash-kpi-sub">all regions · Mon–Fri</div></div>
+    <div class="dash-kpi"><div class="dash-kpi-label">On Leave</div><div class="dash-kpi-val">${tleave}</div><div class="dash-kpi-sub">AL · Dependant · HCA</div></div>
+    <div class="dash-kpi"><div class="dash-kpi-label">Sick / Absent</div><div class="dash-kpi-val">${tsick}</div><div class="dash-kpi-sub">this week</div></div>
+    <div class="dash-kpi"><div class="dash-kpi-label">Total Headcount</div><div class="dash-kpi-val">112</div><div class="dash-kpi-sub">3 regions · 8 skill groups</div></div>`;
+  document.getElementById('dashHead').innerHTML=
+    `<th style="background:var(--navy);color:rgba(255,255,255,.7);font-weight:600;font-size:10px;text-transform:uppercase;padding:7px 10px;text-align:left">Region · Skill</th>`+
+    DN.map((d,i)=>{
+      const day=days[i];const bg=isToday(day)?'#2A4A8A':(isWE(day)?'#1E2640':'var(--navy)');
+      return `<th style="background:${bg};color:rgba(255,255,255,.7);font-weight:600;font-size:10px;text-transform:uppercase;padding:7px 7px;text-align:center">${d}<br><span style="font-weight:400;opacity:.6;font-family:'JetBrains Mono',monospace;font-size:9px">${fmtDisp(day)}</span></th>`;
+    }).join('')+
+    `<th style="background:var(--navy);color:rgba(255,255,255,.7);font-weight:600;font-size:10px;text-transform:uppercase;padding:7px 7px;text-align:center">Total</th>`;
+  let tb='';let grand=Array(7).fill(0);
+  ['EMEA','US','AUS'].forEach(region=>{
+    const rc=RCFG[region];const rs=STAFF.filter(s=>s.region===region);let rt=Array(7).fill(0);
+    rc.skills.forEach(skill=>{
+      const grp=rs.filter(s=>s.skill===skill);if(!grp.length) return;
+      const cnts=days.map(d=>grp.filter(s=>ON_SHIFT.has(getShift(s,d))).length);
+      cnts.forEach((c,i)=>{rt[i]+=c;grand[i]+=c;});
+      const lbl=SL[skill]||skill;
+      tb+=`<tr><td style="padding:5px 10px;border-bottom:1px solid var(--border)"><span class="reg-badge rb-${region}" style="margin-right:4px;font-size:9px">${region}</span><span class="sk-badge">${lbl}</span></td>
+        ${cnts.map((c,i)=>{const we=isWE(days[i]),td=isToday(days[i]);const bg=td?'#FFF8E8':(we?'var(--surface2)':'');const col=c===0?'var(--text3)':(c<2?'#C82A2A':'var(--text)');
+          return `<td style="text-align:center;padding:5px 7px;border-bottom:1px solid var(--border);${bg?'background:'+bg+';':''}font-weight:${c>0?600:400};color:${col};font-family:'JetBrains Mono',monospace;font-size:11px">${c||'—'}</td>`}).join('')}
+        <td style="text-align:center;padding:5px 7px;border-bottom:1px solid var(--border);font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11px">${cnts.reduce((a,b)=>a+b,0)}</td></tr>`;
+    });
+    tb+=`<tr style="background:var(--surface2)"><td style="padding:5px 10px;font-weight:700;font-size:11px;color:var(--navy)">${rc.label} Total</td>
+      ${rt.map((c,i)=>{const we=isWE(days[i]),td=isToday(days[i]);const bg=td?'#FFF0C0':(we?'#EEECEA':'var(--surface2)');return`<td style="text-align:center;padding:5px 7px;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11px;background:${bg}">${c}</td>`}).join('')}
+      <td style="text-align:center;padding:5px 7px;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11px">${rt.reduce((a,b)=>a+b,0)}</td></tr>`;
+  });
+  tb+=`<tr style="background:var(--navy)"><td style="padding:7px 10px;font-weight:700;font-size:11px;color:#fff">Grand Total</td>
+    ${grand.map(c=>`<td style="text-align:center;padding:7px 7px;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:12px;color:#fff">${c}</td>`).join('')}
+    <td style="text-align:center;padding:7px 7px;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:12px;color:#fff">${grand.reduce((a,b)=>a+b,0)}</td></tr>`;
+  document.getElementById('dashBody').innerHTML=tb;
+}
+
+// ═══════════════════════════════════════════════
+// NEW STARTER
+// ═══════════════════════════════════════════════
+function openNS(){openModal('nsModal');}
+async function saveNS(){
+  const f=document.getElementById('nsFirst').value.trim();
+  const l=document.getElementById('nsLast').value.trim();
+  if(!f||!l){alert('Please enter first and last name.');return;}
+  const nid=Math.max(...STAFF.map(s=>s.id))+1;
+  const ns={id:nid,first:f,last:l,
+    region:document.getElementById('nsRegion').value,
+    skill:document.getElementById('nsSkill').value,
+    contract:document.getElementById('nsContract').value,
+    esp:document.getElementById('nsEsp').value==='1',
+    noWeekend:document.getElementById('nsNoWE').value==='1',
+    notes:document.getElementById('nsNotes').value,
+    exceptions:{}};
+  STAFF.push(ns);
+  closeModal('nsModal');
+  renderRota();renderDir();populateLeaveStaff();
+  setSyncing();
+  const res=await apiPost({action:'updateStaff',staff:ns});
+  if(res&&res.success) setSynced(); else setSyncError();
+  alert(`${f} ${l} added and saved.`);
+}
+
+// ═══════════════════════════════════════════════
+// GENERATE MODAL
+// ═══════════════════════════════════════════════
+function openGenModal(){
+  const sel=document.getElementById('genWeekSelect');
+  sel.innerHTML='';
+  for(let i=0;i<=11;i++){
+    const m=getMon(i);const s=fmt(m);
+    const opt=document.createElement('option');
+    opt.value=s;opt.textContent=fmtWk(m);
+    if(i===weekOffset) opt.selected=true;
+    sel.appendChild(opt);
+  }
+  document.getElementById('genWeekLabel').textContent=fmtWk(getMon(weekOffset));
+  document.getElementById('genStatus').style.display='none';
+  document.getElementById('genLog').style.display='none';
+  document.getElementById('genLog').innerHTML='';
+  document.getElementById('genRunBtn').disabled=false;
+  openModal('genModal');
+}
+
+// ═══════════════════════════════════════════════
+// MODAL HELPERS
+// ═══════════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ═══════════════════════════════════════════════
+// VIEW SWITCHING
+// ═══════════════════════════════════════════════
+function showView(name,btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  document.getElementById('weekNavEl').style.display=name==='rota'?'flex':'none';
+  if(name==='directory') renderDir();
+  if(name==='leave') renderLeave();
+  if(name==='dashboard') updateDash();
+}
+
+// ═══════════════════════════════════════════════
+// INIT — load from Sheets on startup
+// ═══════════════════════════════════════════════
+async function init(){
+  setSyncing();
+  try{
+    const data=await apiGet({action:'getAllData'});
+    if(data&&!data.error){
+      // Load leave
+      if(data.leave&&data.leave.length) leaveList=data.leave;
+      // Load history
+      if(data.history){
+        data.history.forEach(h=>{
+          if(!rotationHistory[h.staffId]) rotationHistory[h.staffId]={early:0,mid:0,late:0};
+          if(h.shift==='0800'||h.shift==='0800_430') rotationHistory[h.staffId].early++;
+          else if(h.shift==='1000'||h.shift==='1030_7') rotationHistory[h.staffId].late++;
+          else rotationHistory[h.staffId].mid++;
+        });
+      }
+      // Load config
+      if(data.config&&data.config.weekend_rotation_pointer){
+        weekendRotationPointer=parseInt(data.config.weekend_rotation_pointer)||0;
+      }
+    }
+    setSynced();
+  }catch(e){setSyncError();}
+  // Load current week shifts
+  await loadWeekFromSheets();
+  populateLeaveStaff();
+  renderDir();
+  renderLeave();
+}
+
+init();
+</script>
+</body>
+</html>
